@@ -1,0 +1,134 @@
+# author by: herrywen
+# date: 2019.8.21
+# notice: docker-compose部署gitlab+jenkins+sonarqube+mysql
+version: '3.1'
+
+services:
+  gitlab:
+      image: 'twang2218/gitlab-ce-zh:11.1.4'
+      container_name: "gitlab"
+      restart: unless-stopped
+      networks:
+        - sonarnet1
+      privileged: true
+      hostname: 'gitlab.herrywen.com.cn'
+      environment:
+        TZ: 'Asia/Shanghai'
+        GITLAB_OMNIBUS_CONFIG: |
+          external_url 'http://gitlab.herrywen.com.cn'
+          gitlab_rails['time_zone'] = 'Asia/Shanghai'
+          gitlab_rails['smtp_enable'] = true
+          gitlab_rails['smtp_address'] = "smtp.qq.com"
+          gitlab_rails['smtp_port'] = 465
+          gitlab_rails['smtp_user_name'] = "838626643@qq.com"  #用自己的qq邮箱
+          gitlab_rails['smtp_password'] = "cgcwypezuasjbefb"  #授权码
+          gitlab_rails['smtp_domain'] = "qq.com"
+          gitlab_rails['smtp_authentication'] = "login"
+          gitlab_rails['smtp_enable_starttls_auto'] = true
+          gitlab_rails['smtp_tls'] = true         # https根据需要开启，在最外侧可以配置nginx代理到gitlab的443端口,此时需要设置为true
+          gitlab_rails['gitlab_email_from'] = '838626643@qq.com'
+          gitlab_rails['gitlab_shell_ssh_port'] = 2222
+      ports:
+        - '80:80'
+        - '443:443'
+        - '2222:22'
+      volumes:
+        - /opt/gitlab/config:/etc/gitlab #存储gitlab配置信息
+        - /opt/gitlab/data:/var/opt/gitlab  #存储数据库
+        - /opt/gitlab/logs:/var/log/gitlab  #存储日志信息
+        
+        
+  jenkins:
+    container_name: jenkins
+    build: ./docker_jenkins     #后期编译dockerfile参数，
+   #如果dockerfile的文件名不是默认叫dockerfile.yml那么写成
+   #build:
+   #   context: ./dir         存放dockerfile的目录
+   #   dockerfile: Dockerfile-alternate dockerfile的文件名
+    #image: jenkinsci/blueocean
+    ports:
+      - "8080:8080"
+    networks:
+      - sonarnet1
+    restart: always
+    privileged: true
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - docker.sock:/var/run/docker.sock
+
+  db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    privileged: true
+    ports:
+      - 3308:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_USER: herrywen
+      MYSQL_PASSWORD: herrywen
+      MYSQL_DATABASE: test
+    volumes:
+      - "/var/lib/mysql:/var/lib/mysql"
+      - "/etc/mysql/conf.d:/etc/mysql/conf.d"
+    networks:
+      - sonarnet1
+
+  
+  
+  
+  sonarqube:
+    image: sonarqube:7.7-community
+    privileged: true
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    networks:
+      - sonarnet1
+    environment:
+     - SONARQUBE_JDBC_URL=jdbc:mysql://db:3306/test?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false
+     - SONARQUBE_JDBC_USERNAME=herrywen
+     - SONARQUBE_JDBC_PASSWORD=herrywen
+    #两种写法:
+    #第一种(指定目录挂载，容易出错，建议第二种)
+    #     volumes:
+    #       - "/opt/sonarqube/conf:/opt/sonarqube/conf"
+    #第二种,让docker-compose在/var/lib/docker主程序目录下自己生成挂载卷，比如下面的挂载卷的名字就是test_data,挂载卷路径为/var/lib/docker/volumes/test_conf/_data，重启也不丢失挂载卷
+    #     volumes:
+    #       - conf:/opt/sonarqube/conf
+    #挂载卷生成示例：
+    #"Mounts": [
+    #            {
+    #                "Type": "volume",
+    #                "Name": "test_conf",
+    #                "Source": "/var/lib/docker/volumes/test_conf/_data",
+    #                "Destination": "/opt/sonarqube/conf",
+    #                "Driver": "local",
+    #                "Mode": "rw",
+    #                "RW": true,
+    #                "Propagation": ""
+    #            },
+    volumes:
+      - conf:/opt/sonarqube/conf
+      - data:/opt/sonarqube/data
+      - logs:/opt/sonarqube/logs
+    #设置系统内核参数以及文件限制数,根据报错来添加，如果可以直接执行，可以不设置该参数
+    #sysctls:
+    #  - net.core.somaxconn=1024
+    #  - vm.max_map_count=262144
+    ulimits:
+      nproc: 65536
+      nofile:
+        soft: 65536
+        hard: 65536
+
+volumes:
+   jenkins-data:
+   docker.sock:
+   conf:
+   data:
+   logs:
+networks:
+  sonarnet1:
+    driver: bridge

@@ -1,0 +1,91 @@
+#############################修改centos 7内核包使在docker中可以启用后台服务###############################
+############################# oracle jdk环境初始化 ########################################################
+############################# docker化jenkins且运行用户修改为root ##########################################
+FROM centos:7
+MAINTAINER  herrywen
+#设置container的变量是docker，没有实际意义，可以注释掉
+ENV container docker  
+#Update lib
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
+systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+rm -f /lib/systemd/system/multi-user.target.wants/*;\
+rm -f /etc/systemd/system/*.wants/*;\
+rm -f /lib/systemd/system/local-fs.target.wants/*; \
+rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+rm -f /lib/systemd/system/basic.target.wants/*;\
+rm -f /lib/systemd/system/anaconda.target.wants/*;
+ADD Shanghai /etc/localtime
+RUN echo 'Asia/Shanghai' >/etc/timezone
+ADD apache-maven-3.5.4-bin.tar.gz /usr/local/
+ADD jdk-8u151-linux-x64.tar.gz /usr/local/
+ENV JAVA_HOME /usr/local/jdk1.8.0_151
+ENV JAVA_BIN /usr/local/jdk1.8.0_151/bin
+ENV JRE_HOME /usr/local/jdk1.8.0_151/jre
+ENV PATH $PATH:/usr/local/jdk1.8.0_151/bin:/usr/local/jdk1.8.0_151/jre/bin
+ENV CLASSPATH /usr/local/jdk1.8.0_151/jre/lib:/usr/local/jdk1.8.0_151/lib:/usr/local/jdk1.8.0_151/jre/lib/charsets.jar
+ENV M2_HOME /usr/local/apache-maven-3.5.4
+ENV M2 /usr/local/apache-maven-3.5.4/bin
+#jenkins
+ARG user=root
+ARG group=root
+ARG http_port=8080
+USER ${user}
+RUN yum install -y wget \
+    && wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo \
+    && rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key \
+    && yum install -y jenkins \
+    && yum install -y git \
+    && yum install -y ansible
+ADD jenkins /etc/init.d/jenkins
+RUN chown -R $user:$user /var/lib/jenkins \
+    && chown -R $user:$user /var/cache/jenkins \
+    && chown -R $user:$user /var/log/jenkins
+RUN sed -i 's@JENKINS_USER="jenkins"@JENKINS_USER="root"@g' /etc/sysconfig/jenkins \
+    #&& sed -i 's@JENKINS_PORT="8080"@JENKINS_PORT="8098"@g' /etc/sysconfig/jenkins \
+    && yum install initscripts -y \
+    && systemctl enable jenkins.service
+EXPOSE ${http_port}
+
+CMD ["/usr/sbin/init"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
