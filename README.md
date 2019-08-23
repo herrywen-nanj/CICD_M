@@ -23,4 +23,4 @@ http://192.168.5.186:9000
 
 # mysql访问方式
 mysql -u root -p -h 192.168.5.186 -P 3308
-密码:example
+## 密码:example
