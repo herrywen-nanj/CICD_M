@@ -1,6 +1,6 @@
 # CICD_M
-docker-compose部署jenkins+sonarqube+mysql+jenkins+ansible+maven+jdk1.8
-
+docker-compose一键部署gitlab +sonarqube + mysql + jenkins + ansible + maven + jdk1.8
+添加gitlab的http强制跳转https访问功能
 
 ### 前提条件：
 先在hosts文件中添加IP和域名的映射关系，例如我在192.168.5.186上部署
