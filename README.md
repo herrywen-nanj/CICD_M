@@ -1,5 +1,5 @@
 # CICD_M
-docker-compose部署jenkins+sonarqube+mysql+ansible+jenkins+maven+jdk
+docker-compose部署jenkins+sonarqube+mysql+jenkins+ansible+maven+jdk1.8
 
 
 ### 前提条件：
