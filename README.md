@@ -1,5 +1,5 @@
 # CICD_M
-docker-compose一键部署gitlab +sonarqube + mysql + jenkins + ansible + maven + jdk1.8
+docker-compose一键部署gitlab +sonarqube + mysql + jenkins + ansible + maven + jdk1.8  
 添加gitlab的http强制跳转https访问功能
 
 ### 前提条件：
