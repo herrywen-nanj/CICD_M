@@ -2,7 +2,8 @@
 docker-compose部署jenkins+sonarqube+mysql+ansible+jenkins+maven+jdk
 
 
-## 前提条件：先在hosts文件中添加IP和域名的映射关系，例如我在192.168.5.186上部署
+### 前提条件：
+先在hosts文件中添加IP和域名的映射关系，例如我在192.168.5.186上部署
 example:
 192.168.5.186 harbor.aecg.com.cn
 
