@@ -1,6 +1,6 @@
 # author by: herrywen
 # date: 2019.8.21
-# notice: docker-compose部署gitlab+jenkins+sonarqube+mysql+maven+jdk+ansible
+# notice: docker-compose部署gitlab+jenkins+sonarqube+mysql+maven+jdk+ansible，添加http强制跳转https
 version: '3.1'
 
 services:
