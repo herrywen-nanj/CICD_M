@@ -1,7 +1,7 @@
 #############################修改centos 7内核包使在docker中可以启用后台服务###############################
 ############################# oracle jdk环境初始化 ########################################################
 ############################# docker化jenkins且运行用户修改为root ##########################################
-FROM centos:7
+FROM centos
 MAINTAINER  herrywen
 #设置container的变量是docker，没有实际意义，可以注释掉
 ENV container docker  
@@ -31,25 +31,25 @@ ARG user=root
 ARG group=root
 ARG http_port=8080
 USER ${user}
-RUN yum install -y wget \
-    && wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo \
-    && rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key \
-    && yum install -y jenkins \
+COPY jenkins-2.176.2-1.1.noarch.rpm /opt
+RUN cd /opt \
+    && yum install -y jenkins-2.176.2-1.1.noarch.rpm \
     && yum install -y git \
-    && yum install -y ansible
+    && yum install -y ansible \
+    && yum install -y sudo
 ADD jenkins /etc/init.d/jenkins
+RUN chmod a+x /etc/init.d/jenkins
 RUN chown -R $user:$user /var/lib/jenkins \
     && chown -R $user:$user /var/cache/jenkins \
     && chown -R $user:$user /var/log/jenkins
 RUN sed -i 's@JENKINS_USER="jenkins"@JENKINS_USER="root"@g' /etc/sysconfig/jenkins \
-    #&& sed -i 's@JENKINS_PORT="8080"@JENKINS_PORT="8098"@g' /etc/sysconfig/jenkins \
     && yum install initscripts -y \
-    && systemctl enable jenkins.service
+    && systemctl enable jenkins.service \
+    && sudo /etc/init.d/jenkins start
+VOLUME [ "/sys/fs/cgroup" ]
 EXPOSE ${http_port}
 
 CMD ["/usr/sbin/init"]
-
-
 
 
 
