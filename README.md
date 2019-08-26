@@ -6,7 +6,7 @@ docker-compose一键部署gitlab +sonarqube + mysql + jenkins + ansible + maven 
 先在hosts文件中添加IP和域名的映射关系，例如我在192.168.5.186上部署
 #### example:
 192.168.5.186 harbor.aecg.com.cn
-# 进入dockerfile所在目录启动
+# 启动 
 docker-compose up -d
 
 # gitlab访问方式
