@@ -61,7 +61,6 @@ services:
       - sonarnet1
     restart: always
     privileged: true
-    cap-add: SYS_ADMIN   #添加为系统服务
     volumes:
       - jenkins-data:/var/jenkins_home
       - docker.sock:/var/run/docker.sock
