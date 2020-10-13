@@ -1,4 +1,4 @@
-# CICD_M
+# CICD_M，别名"小公司一把梭"
 docker-compose一键部署gitlab +sonarqube + mysql + jenkins + ansible + maven + jdk1.8  
 添加gitlab的http强制跳转https访问功能
 
