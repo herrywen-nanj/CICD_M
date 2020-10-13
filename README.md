@@ -31,5 +31,5 @@ mysql -u root -p -h 192.168.5.186 -P 3308
 密码:  example
 
 ## 注意:  
-可以在宿主机安装nginx反向代理gitlab,可以获取到客户端的真实IP地址，方便查看日志
-在阿里云申请对应的域名证书，替换上述docker-compose.yaml文件中关于ssl证书相关配置即可使用
+可以在宿主机安装nginx反向代理gitlab,可以获取到客户端的真实IP地址，方便查看日志 
+在阿里云申请对应的域名证书，替换上述docker-compose.yaml文件中关于ssl,即harbor.aecg.com.cn证书相关配置即可使用
